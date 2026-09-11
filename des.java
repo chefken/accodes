@@ -1,31 +1,37 @@
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Scanner;
 
-public class des {
+public class DESExample {
 
     public static void main(String[] args) throws Exception {
+
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("Enter text to encrypt: ");
-        String plainText = sc.nextLine();
+        System.out.print("Enter message: ");
+        String message = sc.nextLine();
 
-        KeyGenerator keyGen = KeyGenerator.getInstance("DES");
-        SecretKey secretKey = keyGen.generateKey();
+        System.out.print("Enter key (8 characters): ");
+        String key = sc.nextLine();
 
-        Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "DES");
 
-        desCipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] encryptedBytes = desCipher.doFinal(plainText.getBytes());
-        String encryptedText = Base64.getEncoder().encodeToString(encryptedBytes);
-        System.out.println("Encrypted Text: " + encryptedText);
+        Cipher cipher = Cipher.getInstance("DES");
 
-        desCipher.init(Cipher.DECRYPT_MODE, secretKey);
-        byte[] decryptedBytes = desCipher.doFinal(Base64.getDecoder().decode(encryptedText));
-        String decryptedText = new String(decryptedBytes);
-        System.out.println("Decrypted Text: " + decryptedText);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        byte[] encrypted = cipher.doFinal(message.getBytes());
+
+        String ciphertext = Base64.getEncoder().encodeToString(encrypted);
+
+        System.out.println("Encrypted message: " + ciphertext);
+
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+        byte[] decrypted = cipher.doFinal(encrypted);
+
+        System.out.println("Decrypted message: " + new String(decrypted));
 
         sc.close();
     }
